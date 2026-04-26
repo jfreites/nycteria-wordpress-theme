@@ -58,6 +58,16 @@ function nycteria_store_woocommerce_scripts() {
 		}';
 
 	wp_add_inline_style( 'nycteria-store-woocommerce-style', $inline_font );
+
+	if ( is_product() ) {
+		wp_enqueue_script(
+			'nycteria-store-single-product',
+			get_template_directory_uri() . '/js/single-product.js',
+			array( 'wc-add-to-cart-variation' ),
+			_S_VERSION,
+			true
+		);
+	}
 }
 add_action( 'wp_enqueue_scripts', 'nycteria_store_woocommerce_scripts' );
 
@@ -257,3 +267,169 @@ function nycteria_cart_count_fragment( $fragments ) {
 	return $fragments;
 }
 add_filter( 'woocommerce_add_to_cart_fragments', 'nycteria_cart_count_fragment' );
+
+if ( ! function_exists( 'nycteria_store_product_breadcrumb' ) ) {
+	/**
+	 * Render breadcrumbs for the single-product template.
+	 *
+	 * @return void
+	 */
+	function nycteria_store_product_breadcrumb() {
+		?>
+		<nav class="page-breadcrumbs shop-single__breadcrumbs" aria-label="<?php esc_attr_e( 'Breadcrumb', 'nycteria-store' ); ?>">
+			<?php if ( function_exists( 'yoast_breadcrumb' ) ) : ?>
+				<?php yoast_breadcrumb( '<p>', '</p>' ); ?>
+			<?php elseif ( function_exists( 'rank_math_the_breadcrumbs' ) ) : ?>
+				<?php rank_math_the_breadcrumbs(); ?>
+			<?php else : ?>
+				<?php
+				woocommerce_breadcrumb(
+					array(
+						'wrap_before' => '<p class="woocommerce-breadcrumb">',
+						'wrap_after'  => '</p>',
+					)
+				);
+				?>
+			<?php endif; ?>
+		</nav>
+		<?php
+	}
+}
+
+if ( ! function_exists( 'nycteria_store_get_attribute_swatch_style' ) ) {
+	/**
+	 * Return an inline style for color-based swatches.
+	 *
+	 * @param string $attribute Attribute slug.
+	 * @param string $value     Option value.
+	 * @return string
+	 */
+	function nycteria_store_get_attribute_swatch_style( $attribute, $value ) {
+		$attribute = wc_attribute_label( $attribute );
+		$is_color  = false !== stripos( $attribute, 'color' ) || false !== stripos( $attribute, 'colour' );
+
+		if ( ! $is_color ) {
+			return '';
+		}
+
+		$normalized = sanitize_title( (string) $value );
+		$map        = array(
+			'black'      => '#111111',
+			'white'      => '#f5f5f5',
+			'ivory'      => '#f4f1de',
+			'cream'      => '#efe6d3',
+			'beige'      => '#d6c2a1',
+			'nude'       => '#c8a27c',
+			'brown'      => '#6f4e37',
+			'tan'        => '#b08968',
+			'red'        => '#a32020',
+			'burgundy'   => '#6d071a',
+			'maroon'     => '#5f1020',
+			'pink'       => '#d88ca0',
+			'orange'     => '#c96b2c',
+			'yellow'     => '#d6ad32',
+			'gold'       => '#b89635',
+			'green'      => '#567a56',
+			'olive'      => '#6b6d3f',
+			'blue'       => '#445f8f',
+			'navy'       => '#1d2f4f',
+			'purple'     => '#6a2c70',
+			'lilac'      => '#9f8bb3',
+			'grey'       => '#8b8b8b',
+			'gray'       => '#8b8b8b',
+			'silver'     => '#b8b8b8',
+			'charcoal'   => '#36454f',
+		);
+		$color_code = '';
+
+		if ( preg_match( '/^#(?:[0-9a-f]{3}){1,2}$/i', (string) $value ) ) {
+			$color_code = $value;
+		} elseif ( isset( $map[ $normalized ] ) ) {
+			$color_code = $map[ $normalized ];
+		} else {
+			$parts = explode( '-', $normalized );
+
+			foreach ( $parts as $part ) {
+				if ( isset( $map[ $part ] ) ) {
+					$color_code = $map[ $part ];
+					break;
+				}
+			}
+		}
+
+		if ( ! $color_code ) {
+			return '';
+		}
+
+		return '--swatch-color:' . esc_attr( $color_code ) . ';';
+	}
+}
+
+if ( ! function_exists( 'nycteria_store_variation_swatches' ) ) {
+	/**
+	 * Append square variation swatches after the native attribute select.
+	 *
+	 * @param string $html Original dropdown HTML.
+	 * @param array  $args Dropdown arguments.
+	 * @return string
+	 */
+	function nycteria_store_variation_swatches( $html, $args ) {
+		if ( ! is_product() || empty( $args['options'] ) || empty( $args['product'] ) || empty( $args['attribute'] ) ) {
+			return $html;
+		}
+
+		$product   = $args['product'];
+		$attribute = $args['attribute'];
+		$options   = $args['options'];
+		$input_name = ! empty( $args['name'] ) ? $args['name'] : 'attribute_' . sanitize_title( $attribute );
+
+		if ( empty( $options ) && ! empty( $product ) && ! empty( $attribute ) ) {
+			$attributes = $product->get_variation_attributes();
+			$options    = $attributes[ $attribute ];
+		}
+
+		if ( empty( $options ) ) {
+			return $html;
+		}
+
+		$attribute_label = wc_attribute_label( $attribute );
+		$current_value   = isset( $args['selected'] ) ? (string) $args['selected'] : '';
+		$items_markup    = '';
+
+		foreach ( $options as $option ) {
+			$option_slug = (string) $option;
+			$label       = $option_slug;
+
+			if ( taxonomy_exists( $attribute ) ) {
+				$term = get_term_by( 'slug', $option_slug, $attribute );
+
+				if ( $term && ! is_wp_error( $term ) ) {
+					$label = $term->name;
+				}
+			}
+
+			$is_selected  = $current_value === $option_slug;
+			$swatch_style = nycteria_store_get_attribute_swatch_style( $attribute, $option_slug );
+
+			$items_markup .= sprintf(
+				'<button type="button" class="shop-single__swatch%1$s" data-value="%2$s"%3$s aria-pressed="%4$s" aria-label="%5$s"><span class="shop-single__swatch-label">%6$s</span></button>',
+				$is_selected ? ' is-selected' : '',
+				esc_attr( $option_slug ),
+				$swatch_style ? ' style="' . esc_attr( $swatch_style ) . '"' : '',
+				$is_selected ? 'true' : 'false',
+				esc_attr( sprintf( __( '%1$s: %2$s', 'nycteria-store' ), $attribute_label, $label ) ),
+				esc_html( $label )
+			);
+		}
+
+		$html .= sprintf(
+			'<div class="shop-single__attribute-ui" data-attribute_name="%1$s"><div class="shop-single__attribute-label">%2$s</div><div class="shop-single__swatches" role="list">%3$s</div></div>',
+			esc_attr( $input_name ),
+			esc_html( $attribute_label ),
+			$items_markup
+		);
+
+		return $html;
+	}
+}
+add_filter( 'woocommerce_dropdown_variation_attribute_options_html', 'nycteria_store_variation_swatches', 10, 2 );
