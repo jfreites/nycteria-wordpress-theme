@@ -41,7 +41,7 @@ $display_phone = $store_phone ? $store_phone : $contact_phone;
 
 <main id="primary" class="site-main contact-page-main">
 	<section class="contact-hero" style="position: relative; min-height: 360px; height: 50vh; overflow: hidden;">
-		<img src="<?php echo get_stylesheet_directory_uri(); ?>/assets/images/hero-contact-C7zUOIEP.jpg" alt="Interior gótico de Nycteria" width="1920" height="800" style="position: absolute; top: 0; left: 0; right: 0; object-fit: cover; width: 100%;">
+		<img src="<?php echo get_stylesheet_directory_uri(); ?>/assets/images/nycteria-store-front.jpg" alt="Ubicación fisica de la tienda de Nycteria" width="1920" height="800" style="position: absolute; top: 0; left: 0; right: 0; object-fit: cover; width: 100%;">
 		<div class="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-background/30" style="position: absolute; top:0; left:0; right:0; bottom:0; background-image: linear-gradient(to top, hsl(0 0% 4%), hsl(0 0% 4% / .6), hsl(0 0% 4% / .3));"></div>
 		<div class="page-shell contact-hero__inner" style="position: relative;">
 			<p class="homepage-kicker"><?php esc_html_e('Nycteria Store', 'nycteria-store'); ?></p>

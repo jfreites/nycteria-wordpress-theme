@@ -101,17 +101,12 @@
 			if ( inner ) {
 				inner.outerHTML = data.drawer_html;
 			}
-			bindItemEvents();
 		}
 
 		// Sync the header badge count.
 		if ( data.cart_count !== undefined && countEl ) {
 			countEl.textContent = data.cart_count;
 		}
-
-		// Notify WooCommerce that fragments may need refreshing so other
-		// WC components (e.g., mini-cart widgets) stay in sync.
-		$( document.body ).trigger( 'wc_fragment_refresh' );
 	}
 
 	// ─── Loading state ────────────────────────────────────────────────────────
@@ -165,37 +160,35 @@
 			} );
 	}
 
-	// ─── Bind per-item events ─────────────────────────────────────────────────
-	// Called on init and after every inner HTML replacement.
+	// ─── Delegated drawer actions ─────────────────────────────────────────────
 
-	function bindItemEvents() {
-		var inner = drawer.querySelector( '.cart-drawer__inner' );
-		if ( ! inner ) return;
+	drawer.addEventListener( 'click', function ( event ) {
+		var minus  = event.target.closest( '.cart-drawer__qty-btn--minus' );
+		var plus   = event.target.closest( '.cart-drawer__qty-btn--plus' );
+		var remove = event.target.closest( '.cart-drawer__remove' );
+		var itemEl = event.target.closest( '.cart-drawer__item' );
 
-		inner.querySelectorAll( '.cart-drawer__item' ).forEach( function ( itemEl ) {
-			var minus  = itemEl.querySelector( '.cart-drawer__qty-btn--minus' );
-			var plus   = itemEl.querySelector( '.cart-drawer__qty-btn--plus' );
-			var remove = itemEl.querySelector( '.cart-drawer__remove' );
+		if ( ! itemEl || itemEl.classList.contains( 'is-loading' ) ) {
+			return;
+		}
 
-			if ( minus ) {
-				minus.addEventListener( 'click', function () {
-					handleQtyChange( itemEl, -1 );
-				} );
-			}
+		if ( minus ) {
+			event.preventDefault();
+			handleQtyChange( itemEl, -1 );
+			return;
+		}
 
-			if ( plus ) {
-				plus.addEventListener( 'click', function () {
-					handleQtyChange( itemEl, 1 );
-				} );
-			}
+		if ( plus ) {
+			event.preventDefault();
+			handleQtyChange( itemEl, 1 );
+			return;
+		}
 
-			if ( remove ) {
-				remove.addEventListener( 'click', function () {
-					handleRemove( itemEl );
-				} );
-			}
-		} );
-	}
+		if ( remove ) {
+			event.preventDefault();
+			handleRemove( itemEl );
+		}
+	} );
 
 	// ─── WooCommerce event bridge (jQuery required for WC custom events) ──────
 
@@ -204,14 +197,9 @@
 		openDrawer();
 	} );
 
-	// Re-bind item events after WooCommerce refreshes fragments
-	// (e.g., after using the native "Add to cart" button on shop/product pages).
-	$( document.body ).on( 'wc_fragments_refreshed wc_cart_button_updated', function () {
-		bindItemEvents();
+	// Keep the drawer in sync with WooCommerce classic cart page updates.
+	$( document.body ).on( 'updated_wc_div updated_cart_totals wc_cart_emptied', function () {
+		$( document.body ).trigger( 'wc_fragment_refresh' );
 	} );
-
-	// ─── Init ─────────────────────────────────────────────────────────────────
-
-	bindItemEvents();
 
 } ( jQuery ) );

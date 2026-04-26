@@ -63,7 +63,7 @@ function nycteria_store_woocommerce_scripts() {
 		wp_enqueue_script(
 			'nycteria-store-single-product',
 			get_template_directory_uri() . '/js/single-product.js',
-			array( 'wc-add-to-cart-variation' ),
+			array( 'wc-add-to-cart', 'wc-add-to-cart-variation' ),
 			_S_VERSION,
 			true
 		);
