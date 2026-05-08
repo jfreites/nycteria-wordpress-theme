@@ -75,12 +75,12 @@
 
 			<div class="header-actions">
 				<?php if ( $show_search ) : ?>
-					<a class="header-icon search-toggle" href="<?php echo esc_url( add_query_arg( 's', '', home_url( '/' ) ) ); ?>" aria-label="<?php esc_attr_e( 'Search', 'nycteria-store' ); ?>">
+					<button class="header-icon search-toggle" aria-label="<?php esc_attr_e( 'Search', 'nycteria-store' ); ?>" aria-expanded="false" aria-controls="search-overlay">
 						<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
 							<circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="1.5"/>
 							<path d="M16 16l4.5 4.5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5"/>
 						</svg>
-					</a>
+					</button>
 				<?php endif; ?>
 
 				<a class="header-cart-link" href="<?php echo esc_url( $cart_url ); ?>" aria-label="<?php esc_attr_e( 'View cart', 'nycteria-store' ); ?>">
@@ -94,6 +94,19 @@
 			</div>
 		</div>
 	</header>
+
+	<?php if ( $show_search ) : ?>
+		<div id="search-overlay" class="search-overlay" role="dialog" aria-label="<?php esc_attr_e( 'Search', 'nycteria-store' ); ?>" aria-hidden="true">
+			<div class="search-overlay__inner">
+				<button class="search-overlay__close" aria-label="<?php esc_attr_e( 'Close search', 'nycteria-store' ); ?>">
+					<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+						<path d="M4 4l16 16M20 4L4 20" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5"/>
+					</svg>
+				</button>
+				<?php get_search_form(); ?>
+			</div>
+		</div>
+	<?php endif; ?>
 
 	<?php if ( $header_announcement ) : ?>
 	<div class="header-announcement">
