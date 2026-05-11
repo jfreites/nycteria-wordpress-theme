@@ -70,6 +70,62 @@
 	}
 
 	/**
+	 * Search overlay toggle.
+	 */
+	const searchToggle = document.querySelector( '.search-toggle' );
+	const searchOverlay = document.getElementById( 'search-overlay' );
+	const searchClose = document.querySelector( '.search-overlay__close' );
+
+	if ( searchToggle && searchOverlay ) {
+		searchToggle.addEventListener( 'click', function() {
+			const isOpen = searchOverlay.classList.contains( 'is-active' );
+			if ( isOpen ) {
+				searchOverlay.classList.remove( 'is-active' );
+				searchOverlay.setAttribute( 'aria-hidden', 'true' );
+				searchToggle.setAttribute( 'aria-expanded', 'false' );
+			} else {
+				searchOverlay.classList.add( 'is-active' );
+				searchOverlay.setAttribute( 'aria-hidden', 'false' );
+				searchToggle.setAttribute( 'aria-expanded', 'true' );
+				const searchInput = searchOverlay.querySelector( '.search-field' );
+				if ( searchInput ) {
+					searchInput.focus();
+				}
+			}
+		} );
+
+		if ( searchClose ) {
+			searchClose.addEventListener( 'click', function() {
+				searchOverlay.classList.remove( 'is-active' );
+				searchOverlay.setAttribute( 'aria-hidden', 'true' );
+				searchToggle.setAttribute( 'aria-expanded', 'false' );
+				searchToggle.focus();
+			} );
+		}
+
+		document.addEventListener( 'keydown', function( event ) {
+			if ( event.key === 'Escape' && searchOverlay.classList.contains( 'is-active' ) ) {
+				searchOverlay.classList.remove( 'is-active' );
+				searchOverlay.setAttribute( 'aria-hidden', 'true' );
+				searchToggle.setAttribute( 'aria-expanded', 'false' );
+				searchToggle.focus();
+			}
+		} );
+
+		document.addEventListener( 'click', function( event ) {
+			if (
+				searchOverlay.classList.contains( 'is-active' ) &&
+				! searchOverlay.contains( event.target ) &&
+				! searchToggle.contains( event.target )
+			) {
+				searchOverlay.classList.remove( 'is-active' );
+				searchOverlay.setAttribute( 'aria-hidden', 'true' );
+				searchToggle.setAttribute( 'aria-expanded', 'false' );
+			}
+		} );
+	}
+
+	/**
 	 * Sets or removes .focus class on an element.
 	 */
 	function toggleFocus() {
