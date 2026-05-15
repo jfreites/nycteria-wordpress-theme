@@ -230,4 +230,20 @@
 			} );
 		}
 	} );
+
+	/**
+	 * Product gallery: smooth scroll on thumbnail click.
+	 */
+	const gallery = document.querySelector( '.woocommerce-product-gallery' );
+	if ( gallery ) {
+		const thumbs = gallery.querySelector( '.flex-control-thumbs' );
+		if ( thumbs ) {
+			thumbs.addEventListener( 'click', function( event ) {
+				const thumb = event.target.closest( 'li' );
+				if ( thumb && gallery.scrollIntoView ) {
+					gallery.scrollIntoView( { behavior: 'smooth', block: 'start' } );
+				}
+			} );
+		}
+	}
 }() );
