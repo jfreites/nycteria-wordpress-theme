@@ -433,3 +433,9 @@ if ( ! function_exists( 'nycteria_store_variation_swatches' ) ) {
 	}
 }
 add_filter( 'woocommerce_dropdown_variation_attribute_options_html', 'nycteria_store_variation_swatches', 10, 2 );
+
+/**
+ * Remove redundant headings from product tabs.
+ */
+add_filter( 'woocommerce_product_description_heading', '__return_false' );
+add_filter( 'woocommerce_product_additional_information_heading', '__return_false' );
