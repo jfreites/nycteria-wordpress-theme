@@ -603,6 +603,24 @@ function nycteria_store_customize_register( $wp_customize ) {
 	);
 
 	$wp_customize->add_setting(
+		'nycteria_contact_email',
+		array(
+			'default'           => '',
+			'sanitize_callback' => 'sanitize_text_field',
+		)
+	);
+
+	$wp_customize->add_control(
+		'nycteria_contact_email',
+		array(
+			'label'       => __( 'Contact Email', 'nycteria-store' ),
+			'description' => __( 'Used if no store email is available from WooCommerce.', 'nycteria-store' ),
+			'section'     => 'nycteria_contact_page',
+			'type'        => 'text',
+		)
+	);
+
+	$wp_customize->add_setting(
 		'nycteria_contact_map_embed_url',
 		array(
 			'default'           => '',
@@ -617,6 +635,32 @@ function nycteria_store_customize_register( $wp_customize ) {
 			'description' => __( 'Paste the Google Maps embed URL for the iframe.', 'nycteria-store' ),
 			'section'     => 'nycteria_contact_page',
 			'type'        => 'url',
+		)
+	);
+
+	$wp_customize->add_section(
+		'nycteria_shop',
+		array(
+			'title' => __( 'Shop Archive', 'nycteria-store' ),
+		)
+	);
+
+	$wp_customize->add_setting(
+		'nycteria_shop_header_image',
+		array(
+			'sanitize_callback' => 'absint',
+		)
+	);
+
+	$wp_customize->add_control(
+		new WP_Customize_Media_Control(
+			$wp_customize,
+			'nycteria_shop_header_image',
+			array(
+				'label'     => __( 'Header Background Image', 'nycteria-store' ),
+				'section'   => 'nycteria_shop',
+				'mime_type' => 'image',
+			)
 		)
 	);
 
@@ -682,7 +726,7 @@ function nycteria_store_customize_register( $wp_customize ) {
 	);
 
 	$wp_customize->add_setting(
-		'nycteria_footer_pinterest_url',
+		'nycteria_footer_facebook_url',
 		array(
 			'default'           => '',
 			'sanitize_callback' => 'esc_url_raw',
@@ -690,9 +734,26 @@ function nycteria_store_customize_register( $wp_customize ) {
 	);
 
 	$wp_customize->add_control(
-		'nycteria_footer_pinterest_url',
+		'nycteria_footer_facebook_url',
 		array(
-			'label'   => __( 'Pinterest URL', 'nycteria-store' ),
+			'label'   => __( 'Facebook URL', 'nycteria-store' ),
+			'section' => 'nycteria_footer',
+			'type'    => 'url',
+		)
+	);
+
+	$wp_customize->add_setting(
+		'nycteria_footer_tiktok_url',
+		array(
+			'default'           => '',
+			'sanitize_callback' => 'esc_url_raw',
+		)
+	);
+
+	$wp_customize->add_control(
+		'nycteria_footer_tiktok_url',
+		array(
+			'label'   => __( 'TikTok URL', 'nycteria-store' ),
 			'section' => 'nycteria_footer',
 			'type'    => 'url',
 		)

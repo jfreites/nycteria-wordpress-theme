@@ -12,7 +12,10 @@
 $footer_brand_image_id    = absint( get_theme_mod( 'nycteria_footer_brand_image' ) );
 $footer_brand_description = trim( (string) get_theme_mod( 'nycteria_footer_brand_description', __( 'Moda oscura para quienes caminan entre mundos. Elegancia gotica curada desde 2024.', 'nycteria-store' ) ) );
 $footer_instagram_url     = esc_url( get_theme_mod( 'nycteria_footer_instagram_url', '' ) );
-$footer_pinterest_url     = esc_url( get_theme_mod( 'nycteria_footer_pinterest_url', '' ) );
+$footer_facebook_url      = esc_url( get_theme_mod( 'nycteria_footer_facebook_url', '' ) );
+$footer_tiktok_url        = esc_url( get_theme_mod( 'nycteria_footer_tiktok_url', '' ) );
+$footer_pinterest_url     = false;
+
 $footer_newsletter_code   = trim( (string) get_theme_mod( 'nycteria_footer_newsletter_shortcode', '' ) );
 $footer_copyright_text    = trim( (string) get_theme_mod( 'nycteria_footer_copyright_text', __( 'NYCTERIA Gothic Boutique. Todos los derechos reservados.', 'nycteria-store' ) ) );
 
@@ -83,17 +86,21 @@ if ( $footer_brand_image_id ) {
 							</a>
 						<?php endif; ?>
 
-						<a class="site-footer__social-link" href="#" target="_blank" rel="noreferrer noopener" aria-label="<?php esc_attr_e( 'Facebook', 'nycteria-store' ); ?>">
+						<?php if ( $footer_facebook_url ) : ?>
+						<a class="site-footer__social-link" href="<?php echo esc_url( $footer_facebook_url ); ?>" target="_blank" rel="noreferrer noopener" aria-label="<?php esc_attr_e( 'Facebook', 'nycteria-store' ); ?>">
 							<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
 								<path d="M16 8.049c0-4.446-3.582-8.05-8-8.05C3.58 0-.002 3.603-.002 8.05c0 4.017 2.926 7.347 6.75 7.951v-5.625h-2.03V8.05H6.75V6.275c0-2.017 1.195-3.131 3.022-3.131.876 0 1.791.157 1.791.157v1.98h-1.009c-.993 0-1.303.621-1.303 1.258v1.51h2.218l-.354 2.326H9.25V16c3.824-.604 6.75-3.934 6.75-7.951"/>
 							</svg>
 						</a>
+						<?php endif; ?>
 
-						<a class="site-footer__social-link" href="#" target="_blank" rel="noreferrer noopener" aria-label="<?php esc_attr_e( 'TikTok', 'nycteria-store' ); ?>">
+						<?php if ( $footer_tiktok_url ) : ?>
+						<a class="site-footer__social-link" href="<?php echo esc_url( $footer_tiktok_url ); ?>" target="_blank" rel="noreferrer noopener" aria-label="<?php esc_attr_e( 'TikTok', 'nycteria-store' ); ?>">
 							<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
 								<path d="M9 0h1.98c.144.715.54 1.617 1.235 2.512C12.895 3.389 13.797 4 15 4v2c-1.753 0-3.07-.814-4-1.829V11a5 5 0 1 1-5-5v2a3 3 0 1 0 3 3z"/>
 							</svg>
 						</a>
+						<?php endif; ?>
 					</div>
 
 					<?php if ( $footer_newsletter_code ) : ?>

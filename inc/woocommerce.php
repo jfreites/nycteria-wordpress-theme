@@ -102,8 +102,8 @@ add_filter( 'body_class', 'nycteria_store_woocommerce_active_body_class' );
  */
 function nycteria_store_woocommerce_related_products_args( $args ) {
 	$defaults = array(
-		'posts_per_page' => 3,
-		'columns'        => 3,
+		'posts_per_page' => 2,
+		'columns'        => 1,
 	);
 
 	$args = wp_parse_args( $defaults, $args );
@@ -111,6 +111,12 @@ function nycteria_store_woocommerce_related_products_args( $args ) {
 	return $args;
 }
 add_filter( 'woocommerce_output_related_products_args', 'nycteria_store_woocommerce_related_products_args' );
+
+/**
+ * Move Related Products to product summary.
+ */
+remove_action( 'woocommerce_after_single_product_summary', 'woocommerce_output_related_products', 20 );
+add_action( 'woocommerce_single_product_summary', 'woocommerce_output_related_products', 60 );
 
 /**
  * Remove default WooCommerce wrapper.

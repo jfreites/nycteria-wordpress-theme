@@ -22,10 +22,13 @@ $archive_description = wc_format_content( term_description() );
 if ( ! $archive_description && is_shop() ) {
 	$archive_description = wc_format_content( get_post_field( 'post_content', wc_get_page_id( 'shop' ) ) );
 }
+
+$header_image_id  = get_theme_mod( 'nycteria_shop_header_image' );
+$header_image_url = $header_image_id ? wp_get_attachment_image_url( $header_image_id, 'full' ) : '';
 ?>
 
 <main id="primary" class="site-main shop-archive">
-	<header class="shop-archive__hero">
+	<header class="shop-archive__hero<?php echo $header_image_url ? ' has-background-image' : ''; ?>" <?php echo $header_image_url ? 'style="background-image: url(' . esc_url( $header_image_url ) . ');"' : ''; ?>>
 		<div class="homepage-shell shop-archive__hero-inner">
 			<p class="homepage-kicker"><?php esc_html_e( 'Nycteria Store', 'nycteria-store' ); ?></p>
 			<h1 class="shop-archive__title"><?php woocommerce_page_title(); ?></h1>

@@ -84,10 +84,13 @@
 			const productId = params.get( 'add-to-cart' ) || ( button ? button.value : '' );
 
 			if ( productId ) {
-				params.set( 'add-to-cart', productId );
 				params.set( 'product_id', productId );
 			}
 		}
+
+		// Ensure add-to-cart is removed from the AJAX request to prevent double addition.
+		// WC_Form_Handler triggers on 'add-to-cart' while WC_AJAX triggers on 'product_id'.
+		params.delete( 'add-to-cart' );
 
 		if ( ! params.get( 'quantity' ) ) {
 			params.set( 'quantity', '1' );

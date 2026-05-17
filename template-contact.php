@@ -114,15 +114,15 @@ $display_phone = $store_phone ? $store_phone : $contact_phone;
 							</h2>
 							<div class="contact-info-card__content">
 								<?php if ($address_lines): ?>
-									<p><?php echo esc_html(implode(', ', $address_lines)); ?></p>
+									<p>📍 <?php echo esc_html(implode(', ', $address_lines)); ?></p>
 								<?php endif; ?>
 								<?php if ($display_phone): ?>
-									<p><a
+									<p>📞 <a
 											href="<?php echo esc_url('tel:' . preg_replace('/[^0-9+]/', '', $display_phone)); ?>"><?php echo esc_html($display_phone); ?></a>
 									</p>
 								<?php endif; ?>
 								<?php if ($contact_email): ?>
-									<p><a
+									<p>📩 <a
 											href="<?php echo esc_url('mailto:' . antispambot($contact_email)); ?>"><?php echo esc_html(antispambot($contact_email)); ?></a>
 									</p>
 								<?php endif; ?>
