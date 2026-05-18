@@ -2585,7 +2585,7 @@ body.cart-drawer-open {
 	position: relative;
 	aspect-ratio: 4/5;
 	overflow: hidden;
-	background-color: var(--bg-surface);
+	/*background-color: var(--bg-surface);*/
 }
 
 .no-results-random__image {

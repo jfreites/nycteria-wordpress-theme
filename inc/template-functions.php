@@ -33,21 +33,18 @@ add_filter( 'body_class', 'nycteria_store_body_classes' );
  */
 function nycteria_store_get_random_no_results_content() {
 	$content_pool = array(
-		array(
+		/*array(
 			'message' => __( 'Lo que buscas se ha desvanecido en las sombras.', 'nycteria-store' ),
 			'image'   => get_template_directory_uri() . '/assets/images/nycteria-store.jpg',
 		),
-		array(
-			'message' => __( 'El abismo no ha devuelto resultados para esta búsqueda.', 'nycteria-store' ),
-			'image'   => get_template_directory_uri() . '/assets/images/flor-morada.png',
-		),
-		array(
-			'message' => __( 'Incluso en la oscuridad, algunas piezas son difíciles de encontrar.', 'nycteria-store' ),
-			'image'   => get_template_directory_uri() . '/assets/images/nycteria-store-front.jpg',
-		),
+		*/
 		array(
 			'message' => __( 'Los ecos de tu búsqueda no han encontrado respuesta en nuestro catálogo.', 'nycteria-store' ),
-			'image'   => get_template_directory_uri() . '/assets/images/hero-contact-C7zUOIEP.jpg',
+			'image'   => get_template_directory_uri() . '/assets/images/cabinet-illustration.png',
+		),
+		array(
+			'message' => __( 'El abismo no ha devuelto resultados para esta búsqueda.', 'nycteria-store' ),
+			'image'   => get_template_directory_uri() . '/assets/images/maniquin-illustration.png',
 		),
 	);
 
