@@ -267,6 +267,16 @@ ul.products li.product {
 	font-weight: 600;
 }
 
+.shop-product-card__price ins {
+	background: inherit;
+	color: rgba(255, 255, 255, 0.86);
+}
+
+.shop-product-card__price del {
+	background: inherit;
+	color: rgba(180, 179, 179, 0.86);
+}
+
 .shop-archive__pagination {
 	display: flex;
 	justify-content: center;
@@ -820,6 +830,11 @@ ul.products li.product {
 	margin-top: 4rem;
 }
 
+.single-product div.product .price ins {
+	background: inherit;
+	color: var(--brand-primary);
+}
+
 @media screen and (max-width: 60em) {
 
 	.single-product div.product {
@@ -1243,4 +1258,49 @@ p.no-comments {
 
 .widget_price_filter .ui-slider-horizontal .ui-slider-range {
 	height: 100%;
+}
+
+
+
+/* Todos los inputs del checkout */
+.wc-block-components-text-input input {
+    background-color: #1a1a1a;
+    border: 1px solid #444;
+    color: #ffffff;
+    border-radius: 4px;
+    padding: 10px 14px;
+}
+
+/* Focus del input */
+.wc-block-components-text-input input:focus {
+    border-color: var(--accent);
+    outline: none;
+}
+
+/* Labels */
+.woocommerce-checkout label {
+    color: #cccccc;
+}
+
+/* Select dropdowns */
+.woocommerce-checkout select {
+    background-color: #1a1a1a;
+    border: 1px solid #444;
+    color: #ffffff;
+}
+
+/* Placeholder */
+.woocommerce-checkout .input-text::placeholder {
+    color: #888;
+}
+
+/* Botón de realizar pedido */
+#place_order {
+    background-color: var(--accent);
+    color: #ffffff;
+    border: none;
+}
+
+#place_order:hover {
+    background-color: var(--accent-light);
 }

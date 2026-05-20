@@ -532,7 +532,7 @@ acronym {
 
 mark,
 ins {
-	background: #fff9c0;
+	background: var(--accent);
 	text-decoration: none;
 }
 
@@ -2761,4 +2761,12 @@ body.cart-drawer-open {
 .search-overlay label {
 	position: relative;
 	display: block;
+}
+
+/*--------------------------------------------------------------
+# Search Overlay
+--------------------------------------------------------------*/
+.site-footer__brand {
+	margin: 0 auto;
+    text-align: center;
 }
