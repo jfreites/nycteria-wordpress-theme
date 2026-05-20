@@ -190,3 +190,33 @@ if ( class_exists( 'WooCommerce' ) ) {
 	require get_template_directory() . '/inc/woocommerce.php';
 	require get_template_directory() . '/inc/cart-drawer.php';
 }
+
+/**
+ * Change sorting
+ * @param mixed $sortby
+ */
+function custom_woocommerce_catalog_orderby( $sortby ) {
+    // Change "Default sorting" label
+    if ( isset( $sortby['menu_order'] ) ) {
+        $sortby['menu_order'] = __( 'Ordena por', 'nycteria-store' );
+    }
+
+    if ( isset( $sortby['price'] ) ) {
+        $sortby['price'] = __( 'Precio', 'nycteria-store' );
+    }
+
+    if ( isset( $sortby['popularity'] ) ) {
+        $sortby['popularity'] = __( 'Lo más Popular', 'nycteria-store' );
+    }
+
+    if ( isset( $sortby['date'] ) ) {
+        $sortby['date'] = __( 'Recién llegados', 'nycteria-store' );
+    }
+
+    // Removed some options
+    unset( $sortby['rating'] );
+	unset( $sortby['price-desc'] );
+
+    return $sortby;
+}
+add_filter( 'woocommerce_catalog_orderby', 'custom_woocommerce_catalog_orderby' );

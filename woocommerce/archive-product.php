@@ -10,13 +10,24 @@ defined( 'ABSPATH' ) || exit;
 get_header( 'shop' );
 
 $current_term = is_tax( 'product_cat' ) ? get_queried_object() : null;
+
+$slugs_to_exclude = array( 'uncategorized', 'sin-categorizar' );
+
 $categories   = get_terms(
 	array(
-		'taxonomy'   => 'product_cat',
-		'hide_empty' => true,
-		'parent'     => 0,
+		'taxonomy'     => 'product_cat',
+		'hide_empty'   => false, // SHOW CATEGORIES WITHOUT PRODUCTS?
+		'parent'       => 0
 	)
 );
+
+// TODO: use IDs and remove this. Use in get_terms function the parameter: 'exclude'    => array( 1, 5 ),
+if ( ! is_wp_error( $categories ) && ! empty( $categories ) ) {
+    $categories = array_filter( $categories, function( $term ) use ( $slugs_to_exclude ) {
+        return ! in_array( $term->slug, $slugs_to_exclude );
+    });
+}
+
 $archive_description = wc_format_content( term_description() );
 
 if ( ! $archive_description && is_shop() ) {
@@ -48,11 +59,34 @@ $header_image_url = $header_image_id ? wp_get_attachment_image_url( $header_imag
 					<?php if ( ! is_wp_error( $categories ) ) : ?>
 						<?php foreach ( $categories as $category ) : ?>
 							<?php
-							$is_active = $current_term && (int) $current_term->term_id === (int) $category->term_id;
+							$subcategories = get_terms(
+								array(
+									'taxonomy'   => 'product_cat',
+									'hide_empty' => false, // SHOW CATEGORIES WITHOUT PRODUCTS?
+									'parent'     => $category->term_id,
+								)
+							);
+							$has_children = ! empty( $subcategories ) && ! is_wp_error( $subcategories );
+							$is_active    = $current_term && ( (int) $current_term->term_id === (int) $category->term_id || (int) $current_term->parent === (int) $category->term_id );
 							?>
-							<a class="shop-archive__category-link<?php echo $is_active ? ' is-active' : ''; ?>" href="<?php echo esc_url( get_term_link( $category ) ); ?>">
-								<?php echo esc_html( $category->name ); ?>
-							</a>
+							<div class="shop-archive__category-wrapper<?php echo $has_children ? ' has-dropdown' : ''; ?>">
+								<a class="shop-archive__category-link<?php echo $is_active ? ' is-active' : ''; ?>" href="<?php echo esc_url( get_term_link( $category ) ); ?>">
+									<?php echo esc_html( $category->name ); ?>
+									<?php if ( $has_children ) : ?>
+										<span class="dropdown-icon" aria-hidden="true"></span>
+									<?php endif; ?>
+								</a>
+								<?php if ( $has_children ) : ?>
+									<div class="shop-archive__category-dropdown">
+										<?php foreach ( $subcategories as $subcat ) : ?>
+											<?php $subcat_active = $current_term && (int) $current_term->term_id === (int) $subcat->term_id; ?>
+											<a class="shop-archive__category-dropdown-link<?php echo $subcat_active ? ' is-active' : ''; ?>" href="<?php echo esc_url( get_term_link( $subcat ) ); ?>">
+												<?php echo esc_html( $subcat->name ); ?>
+											</a>
+										<?php endforeach; ?>
+									</div>
+								<?php endif; ?>
+							</div>
 						<?php endforeach; ?>
 					<?php endif; ?>
 				</div>

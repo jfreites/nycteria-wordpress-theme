@@ -142,6 +142,10 @@ table.shop_table_responsive tr td.download-actions .button {
 	gap: 1rem 1.5rem;
 }
 
+.shop-archive__category-wrapper {
+	position: relative;
+}
+
 .shop-archive__category-link {
 	display: inline-flex;
 	align-items: center;
@@ -155,6 +159,75 @@ table.shop_table_responsive tr td.download-actions .button {
 	letter-spacing: 0.18em;
 	text-decoration: none;
 	text-transform: uppercase;
+	transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+
+.shop-archive__category-wrapper.has-dropdown .shop-archive__category-link {
+	padding-right: 3.5rem;
+}
+
+.dropdown-icon {
+	position: absolute;
+	right: 1.5rem;
+	top: 50%;
+	width: 0.5rem;
+	height: 0.5rem;
+	border-right: 1px solid currentColor;
+	border-bottom: 1px solid currentColor;
+	transform: translateY(-70%) rotate(45deg);
+	transition: transform 0.3s ease;
+	pointer-events: none;
+	opacity: 0.6;
+}
+
+.shop-archive__category-wrapper:hover .dropdown-icon {
+	transform: translateY(-30%) rotate(-135deg);
+	opacity: 1;
+}
+
+.shop-archive__category-dropdown {
+	position: absolute;
+	top: 100%;
+	left: 0;
+	z-index: 100;
+	display: flex;
+	flex-direction: column;
+	min-width: 100%;
+	background: var(--bg-surface);
+	border: 1px solid var(--border-subtle);
+	opacity: 0;
+	visibility: hidden;
+	transform: translateY(10px);
+	transition: all 0.3s ease;
+	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.shop-archive__category-wrapper:hover .shop-archive__category-dropdown {
+	opacity: 1;
+	visibility: visible;
+	transform: translateY(0);
+}
+
+.shop-archive__category-dropdown-link {
+	padding: 1rem 1.5rem;
+	border-bottom: 1px solid var(--border-subtle);
+	color: rgba(255, 255, 255, 0.7);
+	font-size: 0.75rem;
+	letter-spacing: 0.14em;
+	text-decoration: none;
+	text-transform: uppercase;
+	white-space: nowrap;
+	transition: all 0.2s ease;
+}
+
+.shop-archive__category-dropdown-link:last-child {
+	border-bottom: 0;
+}
+
+.shop-archive__category-dropdown-link:hover,
+.shop-archive__category-dropdown-link.is-active {
+	background: var(--bg-elevated);
+	color: var(--brand-primary);
 }
 
 .shop-archive__category-link:hover,
@@ -342,9 +415,13 @@ ul.products li.product {
 		width: 100%;
 	}
 
+	.shop-archive__category-wrapper {
+		flex: 1 1 auto;
+	}
+
 	.shop-archive__category-link {
 		min-width: 0;
-		flex: 1 1 auto;
+		width: 100%;
 	}
 
 	.shop-archive__ordering {
