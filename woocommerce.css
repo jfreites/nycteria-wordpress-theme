@@ -367,6 +367,7 @@ ul.products li.product {
 
 .shop-archive__pagination .woocommerce-pagination ul.page-numbers li {
 	border: 0;
+	list-style-type: none;
 }
 
 .shop-archive__pagination .woocommerce-pagination a,
@@ -714,9 +715,12 @@ ul.products li.product {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	width: 3rem;
+	/*width: 3rem;
 	height: 3rem;
-	padding: 0.25rem;
+	padding: 0.25rem;*/
+	min-width: 3rem;
+	min-height: 2.5rem;
+	padding: 1rem 0.75rem;
 	border: 1px solid var(--border-subtle);
 	background: var(--swatch-color, transparent);
 	color: var(--text-main);
@@ -856,30 +860,34 @@ ul.products li.product {
 }
 
 .single-product div.product .summary .related ul.products {
-	display: flex;
-	flex-direction: column;
-	gap: 1.5rem;
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 1.25rem;
 }
 
 .single-product div.product .summary .related ul.products li.product {
 	width: 100% !important;
 	float: none !important;
 	margin: 0 !important;
-	display: grid;
-	grid-template-columns: 80px 1fr;
-	gap: 1rem;
-	align-items: center;
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+	align-items: flex-start;
 }
 
-.single-product div.product .summary .related ul.products li.product .woocommerce-loop-product__title {
-	font-size: var(--step--1);
+.single-product div.product .summary .related ul.products li.product .shop-product-card__title {
+	font-size: 0.85rem;
 	margin: 0;
 	line-height: 1.2;
 }
 
-.single-product div.product .summary .related ul.products li.product .price {
-	font-size: var(--step--1);
+.single-product div.product .summary .related ul.products li.product .shop-product-card__price {
+	font-size: 0.85rem;
 	margin: 0.25rem 0 0;
+}
+
+.single-product div.product .summary .related ul.products li.product .shop-product-card__body {
+	padding: 0;
 }
 
 .single-product div.product .summary .related ul.products li.product .button {

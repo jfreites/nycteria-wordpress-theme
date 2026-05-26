@@ -102,8 +102,8 @@ add_filter( 'body_class', 'nycteria_store_woocommerce_active_body_class' );
  */
 function nycteria_store_woocommerce_related_products_args( $args ) {
 	$defaults = array(
-		'posts_per_page' => 2,
-		'columns'        => 1,
+		'posts_per_page' => 3,
+		'columns'        => 3,
 	);
 
 	$args = wp_parse_args( $defaults, $args );

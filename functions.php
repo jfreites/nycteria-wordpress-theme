@@ -220,3 +220,146 @@ function custom_woocommerce_catalog_orderby( $sortby ) {
     return $sortby;
 }
 add_filter( 'woocommerce_catalog_orderby', 'custom_woocommerce_catalog_orderby' );
+
+/**
+ * Tracking Order
+ *
+ * Admin Backend
+ */
+add_action( 'woocommerce_admin_order_data_after_shipping_address', 'wc_custom_tracking_fields', 10, 1 );
+
+function wc_custom_tracking_fields( $order ) {
+    // Obtener valores guardados previamente
+    $tracking_number   = $order->get_meta( '_tracking_number' );
+    $tracking_url      = $order->get_meta( '_tracking_url' );
+	$tracking_proviswe = $order->get_meta( '_tracking_provider' );
+
+    echo '<div class="order_data_column" style="width:100%; margin-top:20px;">';
+    echo '<h3><span class="dashicons dashicons-location"></span> Información de Seguimiento</h3>';
+
+    // Campo: Número de seguimiento
+    woocommerce_wp_text_input( array(
+        'id'            => '_tracking_number',
+        'label'         => 'Número de Seguimiento (Guía)',
+        'value'         => $tracking_number,
+        'wrapper_class' => 'form-field-wide',
+        'placeholder'   => 'Ej: 1Z9999999999999999'
+    ) );
+
+    // Campo: URL de seguimiento
+    woocommerce_wp_text_input( array(
+        'id'            => '_tracking_url',
+        'label'         => 'URL de Seguimiento del Proveedor (Dejar en blanco para usar Estafeta)',
+        'value'         => $tracking_url,
+        'wrapper_class' => 'form-field-wide',
+        'placeholder'   => 'https://...'
+    ) );
+
+	// Campo: Proveedor de seguimiento
+    woocommerce_wp_text_input( array(
+        'id'            => '_tracking_provider',
+        'label'         => 'Proveedor de envíos (Dejar en blanco para usar Estafeta)',
+        'value'         => $tracking_proviswe,
+        'wrapper_class' => 'form-field-wide',
+        'placeholder'   => 'ESTAFETA'
+    ) );
+
+    echo '</div>';
+}
+
+/**
+ * Save tracking data
+ */
+add_action( 'woocommerce_process_shop_order_meta', 'wc_save_custom_tracking_fields', 10, 2 );
+
+function wc_save_custom_tracking_fields( $order_id, $post ) {
+    $order = wc_get_order( $order_id );
+
+    if ( isset( $_POST['_tracking_number'] ) ) {
+        $order->update_meta_data( '_tracking_number', sanitize_text_field( $_POST['_tracking_number'] ) );
+    }
+
+    if ( isset( $_POST['_tracking_url'] ) ) {
+        // esc_url_raw asegura que el formato del link sea seguro
+        $order->update_meta_data( '_tracking_url', esc_url_raw( $_POST['_tracking_url'] ) );
+    }
+
+	if ( isset( $_POST['_tracking_provider'] ) ) {
+        $order->update_meta_data( '_tracking_provider', sanitize_text_field( $_POST['_tracking_provider'] ) );
+    }
+
+    $order->save();
+}
+
+/**
+ * Tracking form shortcode
+ */
+add_shortcode( 'rastreo_pedido', 'wc_public_tracking_form_shortcode' );
+
+function wc_public_tracking_form_shortcode() {
+    ob_start();
+
+    if ( isset( $_POST['submit_tracking'] ) && wp_verify_nonce( $_POST['tracking_nonce'], 'verify_tracking_action' ) ) {
+
+        $order_id    = absint( $_POST['order_id'] );
+        $order_email = sanitize_email( $_POST['order_email'] );
+
+        $order = wc_get_order( $order_id );
+
+        if ( $order && strtolower($order->get_billing_email()) === strtolower($order_email) ) {
+            $status            = wc_get_order_status_name( $order->get_status() );
+            $tracking_number   = $order->get_meta( '_tracking_number' );
+            $tracking_url      = $order->get_meta( '_tracking_url' );
+			$tracking_provider = $order->get_meta( '_tracking_provider' );
+
+            // LÓGICA DE ESTAFETA: Si hay número de guía pero no hay URL, construimos la de Estafeta
+            if ( ! empty( $tracking_number ) && empty( $tracking_url ) ) {
+                // urlencode asegura que si el número de guía tiene caracteres especiales (raro, pero posible) no rompa el link
+				// $tracking_url = 'https://wwwqa.estafeta.com/rastrear-envio';
+                $tracking_url = 'https://cs.estafeta.com/es/Tracking/searchByGet?wayBillType=1&wayBill=' . urlencode( $tracking_number );
+            }
+
+			if ( empty ( $tracking_provider ) ) {
+				$tracking_provider = "ESTAFETA";
+			}
+
+            echo '<div class="tracking-result" style="background: var(--bg-elevated); border-left: 4px solid var(--accent); padding: 20px; margin-bottom: 30px; border-radius: 4px;">';
+            echo '<h3 style="margin-top:0; font-size: 1.4rem; margin-bottom: 1rem;">Estado de tu pedido: <strong>' . esc_html( $status ) . '</strong></h3>';
+
+            if ( ! empty( $tracking_number ) ) {
+                echo '<p style="margin-bottom: 0rem;"><strong>Número de guía:</strong> ' . esc_html( $tracking_number ) . '</p>';
+				echo '<p><strong>Proveedor:</strong> ' . esc_html( strtoupper( $tracking_provider ) ) . '</p>';
+
+                if ( ! empty( $tracking_url ) ) {
+                    echo '<a href="' . esc_url( $tracking_url ) . '" target="_blank" class="button alt" style="text-decoration:none; display:inline-block; margin-top:10px;">Rastrear paquete &rarr;</a>';
+                }
+            } else {
+                echo '<p><em>Tu pedido está siendo procesado y aún no tiene un número de guía asignado. Por favor, revisa nuevamente más tarde.</em></p>';
+            }
+
+            echo '</div>';
+        } else {
+            echo '<div style="color: #d63638; background: #fcf0f1; border-left: 4px solid #d63638; padding: 15px; margin-bottom: 20px;">Los datos ingresados no coinciden con ningún pedido registrado. Revisa tu número de pedido y correo.</div>';
+        }
+    }
+
+    // Formulario HTML
+    ?>
+    <form method="POST" action="" class="wc-tracking-form" style="max-width: 400px; margin: 0 auto;">
+        <?php wp_nonce_field( 'verify_tracking_action', 'tracking_nonce' ); ?>
+        <p class="form-row form-row-wide" style="display: flex; flex-direction: column;">
+            <label for="order_id">Número de Pedido <span class="required">*</span></label>
+            <input type="number" name="order_id" id="order_id" required class="input-text" placeholder="Ej: 1045" value="<?php echo isset($_POST['order_id']) ? esc_attr($_POST['order_id']) : ''; ?>">
+        </p>
+        <p class="form-row form-row-wide" style="display: flex; flex-direction: column;">
+            <label for="order_email">Correo electrónico de facturación <span class="required">*</span></label>
+            <input type="email" name="order_email" id="order_email" required class="input-text" placeholder="tu@correo.com" value="<?php echo isset($_POST['order_email']) ? esc_attr($_POST['order_email']) : ''; ?>">
+        </p>
+        <p class="form-row">
+            <button type="submit" name="submit_tracking" class="button wp-element-button">Consultar Estado</button>
+        </p>
+    </form>
+    <?php
+
+    return ob_get_clean();
+}
