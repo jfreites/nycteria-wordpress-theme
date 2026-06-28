@@ -152,4 +152,38 @@
 			menuItem.classList.toggle( 'focus' );
 		}
 	}
+	/**
+	 * Shop Archive category dropdowns for touch devices.
+	 */
+	const shopCategories = document.querySelectorAll( '.shop-archive__category-wrapper.has-dropdown' );
+
+	if ( shopCategories.length > 0 ) {
+		shopCategories.forEach( function( wrapper ) {
+			const link = wrapper.querySelector( '.shop-archive__category-link' );
+
+			link.addEventListener( 'touchstart', function( event ) {
+				if ( ! wrapper.classList.contains( 'is-open' ) ) {
+					event.preventDefault();
+
+					// Close other open category dropdowns
+					shopCategories.forEach( function( otherWrapper ) {
+						if ( otherWrapper !== wrapper ) {
+							otherWrapper.classList.remove( 'is-open' );
+						}
+					} );
+
+					wrapper.classList.add( 'is-open' );
+				}
+			}, { passive: false } );
+		} );
+
+		// Close dropdowns when clicking outside
+		document.addEventListener( 'touchstart', function( event ) {
+			shopCategories.forEach( function( wrapper ) {
+				if ( ! wrapper.contains( event.target ) ) {
+					wrapper.classList.remove( 'is-open' );
+				}
+			} );
+		} );
+	}
 }() );

@@ -180,7 +180,8 @@ table.shop_table_responsive tr td.download-actions .button {
 	opacity: 0.6;
 }
 
-.shop-archive__category-wrapper:hover .dropdown-icon {
+.shop-archive__category-wrapper:hover .dropdown-icon,
+.shop-archive__category-wrapper.is-open .dropdown-icon {
 	transform: translateY(-30%) rotate(-135deg);
 	opacity: 1;
 }
@@ -202,7 +203,8 @@ table.shop_table_responsive tr td.download-actions .button {
 	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 
-.shop-archive__category-wrapper:hover .shop-archive__category-dropdown {
+.shop-archive__category-wrapper:hover .shop-archive__category-dropdown,
+.shop-archive__category-wrapper.is-open .shop-archive__category-dropdown {
 	opacity: 1;
 	visibility: visible;
 	transform: translateY(0);

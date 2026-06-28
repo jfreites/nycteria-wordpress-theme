@@ -247,21 +247,34 @@ function wc_custom_tracking_fields( $order ) {
     ) );
 
     // Campo: URL de seguimiento
-    woocommerce_wp_text_input( array(
-        'id'            => '_tracking_url',
-        'label'         => 'URL de Seguimiento del Proveedor (Dejar en blanco para usar Estafeta)',
-        'value'         => $tracking_url,
-        'wrapper_class' => 'form-field-wide',
-        'placeholder'   => 'https://...'
-    ) );
+    // woocommerce_wp_text_input( array(
+    //     'id'            => '_tracking_url',
+    //     'label'         => 'URL de Seguimiento del Proveedor (Dejar en blanco para usar Estafeta)',
+    //     'value'         => $tracking_url,
+    //     'wrapper_class' => 'form-field-wide',
+    //     'placeholder'   => 'https://...'
+    // ) );
 
 	// Campo: Proveedor de seguimiento
-    woocommerce_wp_text_input( array(
-        'id'            => '_tracking_provider',
-        'label'         => 'Proveedor de envíos (Dejar en blanco para usar Estafeta)',
-        'value'         => $tracking_proviswe,
+    // woocommerce_wp_text_input( array(
+    //     'id'            => '_tracking_provider',
+    //     'label'         => 'Proveedor de envíos (Dejar en blanco para usar Estafeta)',
+    //     'value'         => $tracking_proviswe,
+    //     'wrapper_class' => 'form-field-wide',
+    //     'placeholder'   => 'ESTAFETA'
+    // ) );
+
+    woocommerce_wp_select( array(
+        'id'          => '_tracking_provider',
+        'label'       => __( 'Proveedor de envíos', 'nycteria-store' ),
+        'options'     => array(
+            'estafeta' => __( 'Estafeta', 'nycteria-store' ),
+            'correos_mexico' => __( 'Correos de México', 'nycteria-store' ),
+        ),
+        'value'       => $tracking_proviswe,
+        //'desc_tip'    => true, // Permite un icono de ayuda con descripción
+        //'description' => __( 'Selecciona el proveedor para el envío de este pedido.', 'nycteria-store' ),
         'wrapper_class' => 'form-field-wide',
-        'placeholder'   => 'ESTAFETA'
     ) );
 
     echo '</div>';
@@ -279,13 +292,23 @@ function wc_save_custom_tracking_fields( $order_id, $post ) {
         $order->update_meta_data( '_tracking_number', sanitize_text_field( $_POST['_tracking_number'] ) );
     }
 
+    /*
     if ( isset( $_POST['_tracking_url'] ) ) {
         // esc_url_raw asegura que el formato del link sea seguro
         $order->update_meta_data( '_tracking_url', esc_url_raw( $_POST['_tracking_url'] ) );
     }
+    */
 
 	if ( isset( $_POST['_tracking_provider'] ) ) {
         $order->update_meta_data( '_tracking_provider', sanitize_text_field( $_POST['_tracking_provider'] ) );
+
+        if ( $_POST['_tracking_provider'] === 'estafeta' ) {
+            $tracking_url = 'https://cs.estafeta.com/es/Tracking/searchByGet?wayBillType=1&wayBill=' . urlencode( $tracking_number );
+        } else {
+            $tracking_url = 'https://www.correosdemexico.gob.mx/sslservicios/seguimientoenvio/seguimiento.aspx';
+        }
+
+        $order->update_meta_data( '_tracking_url', esc_url_raw( $tracking_url ) );
     }
 
     $order->save();
@@ -311,17 +334,6 @@ function wc_public_tracking_form_shortcode() {
             $tracking_number   = $order->get_meta( '_tracking_number' );
             $tracking_url      = $order->get_meta( '_tracking_url' );
 			$tracking_provider = $order->get_meta( '_tracking_provider' );
-
-            // LÓGICA DE ESTAFETA: Si hay número de guía pero no hay URL, construimos la de Estafeta
-            if ( ! empty( $tracking_number ) && empty( $tracking_url ) ) {
-                // urlencode asegura que si el número de guía tiene caracteres especiales (raro, pero posible) no rompa el link
-				// $tracking_url = 'https://wwwqa.estafeta.com/rastrear-envio';
-                $tracking_url = 'https://cs.estafeta.com/es/Tracking/searchByGet?wayBillType=1&wayBill=' . urlencode( $tracking_number );
-            }
-
-			if ( empty ( $tracking_provider ) ) {
-				$tracking_provider = "ESTAFETA";
-			}
 
             echo '<div class="tracking-result" style="background: var(--bg-elevated); border-left: 4px solid var(--accent); padding: 20px; margin-bottom: 30px; border-radius: 4px;">';
             echo '<h3 style="margin-top:0; font-size: 1.4rem; margin-bottom: 1rem;">Estado de tu pedido: <strong>' . esc_html( $status ) . '</strong></h3>';
@@ -362,4 +374,48 @@ function wc_public_tracking_form_shortcode() {
     <?php
 
     return ob_get_clean();
+}
+
+/**
+ * Add tracking information to the "Completed Order" email.
+ */
+add_action( 'woocommerce_email_after_order_table', 'nycteria_store_add_tracking_to_email', 10, 4 );
+
+function nycteria_store_add_tracking_to_email( $order, $sent_to_admin, $plain_text, $email ) {
+    // Only show in the "Completed Order" email for the customer
+    if ( 'customer_completed_order' !== $email->id ) {
+        return;
+    }
+
+    $tracking_number   = $order->get_meta( '_tracking_number' );
+    //$tracking_url      = $order->get_meta( '_tracking_url' );
+    $tracking_provider = $order->get_meta( '_tracking_provider' );
+
+    if ( empty( $tracking_number ) ) {
+        return;
+    }
+
+    if ( $tracking_provider === 'estafeta' ) {
+        $tracking_url = 'https://cs.estafeta.com/es/Tracking/searchByGet?wayBillType=1&wayBill=' . urlencode( $tracking_number );
+    } else {
+        $tracking_url = 'https://www.correosdemexico.gob.mx/sslservicios/seguimientoenvio/seguimiento.aspx';
+    }
+
+    $tracking_provider_display_name = $tracking_provider == 'estafeta' ? 'ESTAFETA' : 'CORREOS DE MÉXICO';
+
+    // Output tracking info
+    ?>
+    <div style="margin-bottom: 40px; padding: 20px; background-color: #121212; border-left: 4px solid #c52020; color: #ffffff; font-family: 'Helvetica Neue', Helvetica, Roboto, Arial, sans-serif;">
+        <h2 style="color: #c52020; margin-top: 0; font-size: 18px; text-transform: uppercase;"><?php esc_html_e( 'Información de Envío', 'nycteria-store' ); ?></h2>
+        <p style="margin: 10px 0;">
+            <strong><?php esc_html_e( 'Número de guía:', 'nycteria-store' ); ?></strong> <?php echo esc_html( $tracking_number ); ?><br>
+            <strong><?php esc_html_e( 'Proveedor:', 'nycteria-store' ); ?></strong> <?php echo esc_html( $tracking_provider_display_name ); ?>
+        </p>
+        <p style="margin: 20px 0 0;">
+            <a href="<?php echo esc_url( $tracking_url ); ?>" target="_blank" style="background-color: #c52020; color: #ffffff; padding: 10px 20px; text-decoration: none; border-radius: 2px; font-weight: bold; display: inline-block;">
+                <?php esc_html_e( 'Rastrear paquete &rarr;', 'nycteria-store' ); ?>
+            </a>
+        </p>
+    </div>
+    <?php
 }
