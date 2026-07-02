@@ -1,0 +1,37 @@
+name: Deploy Nycteria Theme
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: 'Tag o branch a desplegar'
+        required: true
+        default: 'main'
+      dry_run:
+        description: '¿Correr en modo dry-run (sin subir cambios)?'
+        type: boolean
+        default: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.ref || github.ref }}
+
+      - name: Deploy via rsync
+        uses: burnett01/rsync-deployments@7.0.1
+        with:
+          switches: >-
+            -avzr --delete
+            --exclude=".git" --exclude="node_modules" --exclude=".github" --exclude=".DS_Store"
+            ${{ github.event.inputs.dry_run == 'false' && '' || '--dry-run' }}
+          path: ./
+          remote_path: ~/domains/nycteria.com/public_html/wp-content/themes/nycteria-store/
+          remote_host: ${{ secrets.HOSTINGER_HOST }}
+          remote_port: ${{ secrets.HOSTINGER_PORT }}
+          remote_user: ${{ secrets.HOSTINGER_USER }}
+          remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
