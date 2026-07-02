@@ -86,6 +86,16 @@ function nycteria_store_sanitize_select_choice( $input, $setting ) {
 }
 
 /**
+ * Sanitize Customizer checkbox values.
+ *
+ * @param mixed $checked Raw checkbox value.
+ * @return bool
+ */
+function nycteria_store_sanitize_checkbox( $checked ) {
+	return (bool) $checked;
+}
+
+/**
  * Add postMessage support for site title and description for the Theme Customizer.
  *
  * @param WP_Customize_Manager $wp_customize Theme Customizer object.
@@ -113,7 +123,7 @@ function nycteria_store_customize_register( $wp_customize ) {
 	}
 
 	$wp_customize->add_section('theme_options', [
-    	'title' => 'Theme Options',
+    	'title' => 'Opciones del Tema',
 	]);
 
 	// Toggle search icon
@@ -126,6 +136,23 @@ function nycteria_store_customize_register( $wp_customize ) {
 		'section' => 'theme_options',
 		'type' => 'checkbox',
 	]);
+
+	$wp_customize->add_setting(
+		'nycteria_enable_cart_drawer',
+		array(
+			'default'           => true,
+			'sanitize_callback' => 'nycteria_store_sanitize_checkbox',
+		)
+	);
+
+	$wp_customize->add_control(
+		'nycteria_enable_cart_drawer',
+		array(
+			'label'   => __( 'Activar cart drawer', 'nycteria-store' ),
+			'section' => 'theme_options',
+			'type'    => 'checkbox',
+		)
+	);
 
 	$wp_customize->add_setting(
 		'nycteria_header_announcement',

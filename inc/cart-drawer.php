@@ -19,7 +19,7 @@ function nycteria_cart_drawer_enqueue() {
 	wp_enqueue_script(
 		'nycteria-cart-drawer',
 		get_template_directory_uri() . '/js/cart-drawer.js',
-		array( 'jquery' ),
+		array( 'jquery', 'wc-cart-fragments' ),
 		_S_VERSION,
 		true
 	);

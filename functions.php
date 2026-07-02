@@ -177,6 +177,15 @@ require get_template_directory() . '/inc/template-functions.php';
 require get_template_directory() . '/inc/customizer.php';
 
 /**
+ * Return whether the custom cart drawer should be loaded.
+ *
+ * @return bool
+ */
+function nycteria_is_cart_drawer_enabled() {
+	return (bool) get_theme_mod( 'nycteria_enable_cart_drawer', true );
+}
+
+/**
  * Load Jetpack compatibility file.
  */
 if ( defined( 'JETPACK__VERSION' ) ) {
@@ -188,7 +197,10 @@ if ( defined( 'JETPACK__VERSION' ) ) {
  */
 if ( class_exists( 'WooCommerce' ) ) {
 	require get_template_directory() . '/inc/woocommerce.php';
-	require get_template_directory() . '/inc/cart-drawer.php';
+
+	if ( nycteria_is_cart_drawer_enabled() ) {
+		require get_template_directory() . '/inc/cart-drawer.php';
+	}
 }
 
 /**
